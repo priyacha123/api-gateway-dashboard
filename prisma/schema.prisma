@@ -4,11 +4,12 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Plan {
@@ -21,7 +22,7 @@ model User {
   email         String         @unique
   passwordHash  String
   plan          Plan           @default(FREE)
-  createAt      DateTime       @default(now())
+  createdAt     DateTime       @default(now())
   requestLogs   RequestLog[]
 }
 
@@ -33,5 +34,5 @@ model RequestLog {
   method        String
   statusCode    Int
   responseTime  Int
-  createAt      DateTime  @default(now())
+  createdAt     DateTime  @default(now())
 }

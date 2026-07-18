@@ -8,7 +8,6 @@ CREATE TABLE "User" (
     "passwordHash" TEXT NOT NULL,
     "plan" "Plan" NOT NULL DEFAULT 'FREE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
