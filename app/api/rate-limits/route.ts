@@ -15,7 +15,7 @@ export async function GET() {
     const usageData = await Promise.all(
         users.map(async (user) => {
             const count = await redis.zcard(`rate:${user.id}`)
-            const limit = PLAN_LIMITS[user.plaan] || 10
+            const limit = PLAN_LIMITS[user.plan] || 10
             return {
                 email: user.email,
                 plan: user.plan,
