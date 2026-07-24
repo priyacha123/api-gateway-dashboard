@@ -1,188 +1,159 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { FolderOpen, Key, Activity, ArrowRight, Plus } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { apiRequest } from '@/lib/auth'
 
-type Log = {
-  id: string
-  method: string
-  route: string
-  statusCode: number
-  responseTime: number
-  createdAt: string
-  user: { email: string; plan: string }
-}
-
-type Metrics = {
-  totalToday: number
-  avgResponseTime: number
-  errorRate4xx: number
-  errorRate5xx: number
-  recentLogs: Log[]
-}
-
-type CBStatus = {
-  service: string
-  state: string
-  failures: number
-}
-
-type RateLimit = {
-  email: string
-  plan: string
-  used: number
-  limit: number
-  remaining: number
-  percent: number
-}
-
-const STATE_COLORS: Record<string, string> = {
-  CLOSED:            'bg-green-100 text-green-800',
-  OPEN:              'bg-red-100 text-red-800',
-  'HALF-OPEN':       'bg-yellow-100 text-yellow-800',
-  'HALF-OPEN-PROBING': 'bg-yellow-100 text-yellow-800'
-}
-
-const METHOD_COLORS: Record<string, string> = {
-  GET:    'bg-blue-100 text-blue-800',
-  POST:   'bg-green-100 text-green-800',
-  PUT:    'bg-yellow-100 text-yellow-800',
-  DELETE: 'bg-red-100 text-red-800'
-}
-
-export default function Dashboard() {
-  const [metrics, setMetrics]     = useState<Metrics | null>(null)
-  const [cbStatus, setCbStatus]   = useState<CBStatus[]>([])
-  const [rateLimits, setRateLimits] = useState<RateLimit[]>([])
-
-  const fetchAll = async () => {
-    const [m, cb, rl] = await Promise.all([
-      fetch('/api/metrics').then(r => r.json()),
-      fetch('/api/circuit-breaker').then(r => r.json()),
-      fetch('/api/rate-limits').then(r => r.json())
-    ])
-    setMetrics(m)
-    setCbStatus(cb.statuses)
-    setRateLimits(rl.usage)
-  }
+export default function DashboardOverview() {
+  const { user } = useAuth()
+  const [billing, setBilling] = useState<any>(null)
+  const [metrics, setMetrics] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchAll()
-    const interval = setInterval(fetchAll, 5000)
-    return () => clearInterval(interval)
+    const fetchData = async () => {
+      try {
+        const [billingRes, metricsRes] = await Promise.all([
+          apiRequest('/billing/status'),
+          fetch('/api/metrics')
+        ])
+        const [billingData, metricsData] = await Promise.all([
+          billingRes.json(),
+          metricsRes.json()
+        ])
+        setBilling(billingData)
+        setMetrics(metricsData)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
   }, [])
 
-  if (!metrics) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Loading dashboard...</p>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-2xl font-medium text-gray-900 mb-8">
-        API Gateway Dashboard
-      </h1>
+    <div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
+          <p className="text-gray-500 text-sm mt-1">Welcome back, {user?.email}</p>
+        </div>
+        <Link
+          href="/dashboard/projects"
+          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" /> New Project
+        </Link>
+      </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
         {[
-          { label: 'Requests today',    value: metrics.totalToday },
-          { label: 'Avg response time', value: `${metrics.avgResponseTime}ms` },
-          { label: '4xx errors',        value: metrics.errorRate4xx },
-          { label: '5xx errors',        value: metrics.errorRate5xx }
-        ].map(card => (
-          <div key={card.label} className="bg-white rounded-xl border border-gray-200 p-5">
-            <p className="text-sm text-gray-500 mb-1">{card.label}</p>
-            <p className="text-2xl font-medium text-gray-900">{card.value}</p>
-          </div>
+          {
+            label: 'Projects',
+            value: `${billing?.usage?.projects || 0} / ${billing?.limits?.projects || 2}`,
+            icon: <FolderOpen className="w-5 h-5 text-indigo-600" />,
+            href: '/dashboard/projects'
+          },
+          {
+            label: 'Active Keys',
+            value: billing?.usage?.activeKeys || 0,
+            icon: <Key className="w-5 h-5 text-indigo-600" />,
+            href: '/dashboard/projects'
+          },
+          {
+            label: 'Requests Today',
+            value: metrics?.totalToday || 0,
+            icon: <Activity className="w-5 h-5 text-indigo-600" />,
+            href: '/dashboard/analytics'
+          }
+        ].map(stat => (
+          <Link key={stat.label} href={stat.href}
+            className="bg-white border border-gray-100 rounded-xl p-5 hover:border-indigo-200 transition-colors"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center">
+                {stat.icon}
+              </div>
+              <ArrowRight className="w-4 h-4 text-gray-300" />
+            </div>
+            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+            <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+          </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h2 className="text-sm font-medium text-gray-700 mb-4">
-            Circuit breaker status
-          </h2>
-          <div className="space-y-3">
-            {cbStatus.map(cb => (
-              <div key={cb.service} className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{cb.service}</p>
-                  <p className="text-xs text-gray-500">{cb.failures} failures</p>
-                </div>
-                <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATE_COLORS[cb.state] || 'bg-gray-100 text-gray-800'}`}>
-                  {cb.state}
-                </span>
-              </div>
-            ))}
+      {/* Plan banner */}
+      {billing?.plan === 'FREE' && (
+        <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-5 flex items-center justify-between">
+          <div>
+            <p className="font-medium text-indigo-900">You&apos;re on the Free plan</p>
+            <p className="text-sm text-indigo-600 mt-0.5">
+              Upgrade to PRO for unlimited projects, keys, and higher rate limits.
+            </p>
           </div>
+          <Link
+            href="/dashboard/billing"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors whitespace-nowrap"
+          >
+            Upgrade to PRO
+          </Link>
         </div>
+      )}
 
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h2 className="text-sm font-medium text-gray-700 mb-4">
-            Rate limit usage
-          </h2>
-          <div className="space-y-4">
-            {rateLimits.map(u => (
-              <div key={u.email}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-700 truncate max-w-[180px]">{u.email}</span>
-                  <span className="text-gray-500">{u.used}/{u.limit} · {u.plan}</span>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${u.percent >= 90 ? 'bg-red-500' : u.percent >= 60 ? 'bg-yellow-400' : 'bg-green-500'}`}
-                    style={{ width: `${Math.min(u.percent, 100)}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+      {/* Recent requests */}
+      {metrics?.recentLogs?.length > 0 && (
+        <div className="mt-8 bg-white border border-gray-100 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-medium text-gray-900">Recent Requests</h2>
+            <Link href="/dashboard/analytics" className="text-sm text-indigo-600 hover:underline">
+              View all
+            </Link>
           </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h2 className="text-sm font-medium text-gray-700 mb-4">
-          Recent requests
-        </h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-gray-500 border-b border-gray-100">
-              <th className="pb-3 font-medium">method</th>
-              <th className="pb-3 font-medium">route</th>
-              <th className="pb-3 font-medium">status</th>
-              <th className="pb-3 font-medium">time</th>
-              <th className="pb-3 font-medium">user</th>
-              <th className="pb-3 font-medium">plan</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {metrics.recentLogs.map(log => (
-              <tr key={log.id} className="hover:bg-gray-50">
-                <td className="py-2.5">
-                  <span className={`text-xs px-2 py-0.5 rounded font-medium ${METHOD_COLORS[log.method] || 'bg-gray-100 text-gray-800'}`}>
-                    {log.method}
-                  </span>
-                </td>
-                <td className="py-2.5 text-gray-700 font-mono text-xs">{log.route}</td>
-                <td className="py-2.5">
-                  <span className={`text-xs font-medium ${log.statusCode >= 500 ? 'text-red-600' : log.statusCode >= 400 ? 'text-yellow-600' : 'text-green-600'}`}>
-                    {log.statusCode}
-                  </span>
-                </td>
-                <td className="py-2.5 text-gray-500">{log.responseTime}ms</td>
-                <td className="py-2.5 text-gray-600 truncate max-w-[160px]">{log.user.email}</td>
-                <td className="py-2.5">
-                  <span className={`text-xs px-2 py-0.5 rounded font-medium ${log.user.plan === 'PRO' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-700'}`}>
-                    {log.user.plan}
-                  </span>
-                </td>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-gray-400 border-b border-gray-50">
+                <th className="pb-3 font-medium">Method</th>
+                <th className="pb-3 font-medium">Route</th>
+                <th className="pb-3 font-medium">Status</th>
+                <th className="pb-3 font-medium">Time</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </main>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {metrics.recentLogs.slice(0, 5).map((log: any) => (
+                <tr key={log.id}>
+                  <td className="py-2.5">
+                    <span className={`text-xs px-2 py-0.5 rounded font-medium ${
+                      log.method === 'GET' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+                    }`}>
+                      {log.method}
+                    </span>
+                  </td>
+                  <td className="py-2.5 text-gray-600 font-mono text-xs">{log.route}</td>
+                  <td className="py-2.5">
+                    <span className={`text-xs font-medium ${
+                      log.statusCode >= 500 ? 'text-red-600' :
+                      log.statusCode >= 400 ? 'text-yellow-600' : 'text-green-600'
+                    }`}>
+                      {log.statusCode}
+                    </span>
+                  </td>
+                  <td className="py-2.5 text-gray-400 text-xs">{log.responseTime}ms</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   )
 }

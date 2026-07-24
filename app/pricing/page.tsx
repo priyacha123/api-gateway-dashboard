@@ -1,81 +1,124 @@
-'use client'
-
 import Link from 'next/link'
-import { Check, Key } from 'lucide-react'
+import { Shield, Zap, BarChart3, Key, ArrowRight, Check } from 'lucide-react'
 import { PLANS } from '@/lib/constants'
 
-export default function PricingPage() {
+export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      {/* Navbar */}
       <nav className="border-b border-gray-100 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <Key className="w-5 h-5 text-indigo-600" />
-            <span className="font-semibold text-gray-900">GateKey</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm text-gray-600">Login</Link>
-            <Link href="/register" className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+            <span className="font-semibold text-gray-900 text-lg">GateKey</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="#features" className="text-sm text-gray-600 hover:text-gray-900">Features</Link>
+            <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900">Pricing</Link>
+            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">Login</Link>
+            <Link href="/register" className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
               Get Started
             </Link>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-24">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Simple, transparent pricing</h1>
-          <p className="text-gray-500 text-lg">Start free. Upgrade when your project grows.</p>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 py-24 text-center">
+        <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-sm px-3 py-1 rounded-full mb-6">
+          <span className="w-2 h-2 bg-indigo-500 rounded-full"></span>
+          API key management for developers
         </div>
+        <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+          Secure API keys.<br />Built-in rate limiting.<br />
+          <span className="text-indigo-600">Zero config.</span>
+        </h1>
+        <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
+          GateKey gives your APIs production-grade security in minutes.
+          Generate keys, set rate limits, monitor usage — all from one dashboard.
+        </p>
+        <div className="flex items-center justify-center gap-4">
+          <Link href="/register" className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+            Start for free <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link href="/pricing" className="text-gray-600 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            View pricing
+          </Link>
+        </div>
+      </section>
 
-        <div className="grid grid-cols-2 gap-8">
-          {Object.entries(PLANS).map(([key, plan]) => (
-            <div
-              key={key}
-              className={`rounded-2xl border-2 p-8 ${key === 'PRO' ? 'border-indigo-600 relative' : 'border-gray-200'}`}
-            >
-              {key === 'PRO' && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs px-4 py-1 rounded-full font-medium">
-                  Most Popular
+      {/* Features */}
+      <section id="features" className="bg-gray-50 py-24">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">Everything your API needs</h2>
+          <p className="text-gray-500 text-center mb-16 max-w-xl mx-auto">Stop building auth and rate limiting from scratch. GateKey handles it so you can focus on your product.</p>
+          <div className="grid grid-cols-3 gap-8">
+            {[
+              {
+                icon: <Key className="w-6 h-6 text-indigo-600" />,
+                title: 'API Key Management',
+                desc: 'Generate, rotate, and revoke API keys with SHA-256 hashing. Keys are shown once and never stored in plain text.'
+              },
+              {
+                icon: <Zap className="w-6 h-6 text-indigo-600" />,
+                title: 'Rate Limiting',
+                desc: 'Sliding window rate limiting via Redis. Set custom limits per key. Protect your services from abuse automatically.'
+              },
+              {
+                icon: <Shield className="w-6 h-6 text-indigo-600" />,
+                title: 'Circuit Breaker',
+                desc: 'Auto-detect failing services and stop cascading failures. CLOSED → OPEN → HALF-OPEN recovery built in.'
+              },
+              {
+                icon: <BarChart3 className="w-6 h-6 text-indigo-600" />,
+                title: 'Usage Analytics',
+                desc: 'See requests over time, error rates, and top keys by usage. All filtered by project.'
+              },
+              {
+                icon: <Shield className="w-6 h-6 text-indigo-600" />,
+                title: 'Request Logging',
+                desc: 'Every request logged with trace ID, response time, and status code. Full audit trail out of the box.'
+              },
+              {
+                icon: <Zap className="w-6 h-6 text-indigo-600" />,
+                title: 'Multi-project Support',
+                desc: 'Organize keys by project. Different apps, different limits, one dashboard.'
+              }
+            ].map(f => (
+              <div key={f.title} className="bg-white p-6 rounded-xl border border-gray-100">
+                <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center mb-4">
+                  {f.icon}
                 </div>
-              )}
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-1">{plan.name}</h2>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                  <span className="text-gray-500 text-sm">/{plan.period}</span>
-                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">{f.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
               </div>
-
-              <ul className="space-y-3 mb-8">
-                {plan.features.map(f => (
-                  <li key={f} className="flex items-center gap-3 text-sm text-gray-600">
-                    <Check className={`w-4 h-4 flex-shrink-0 ${key === 'PRO' ? 'text-indigo-600' : 'text-green-500'}`} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/register"
-                className={`block text-center py-3 rounded-lg font-medium transition-colors ${
-                  key === 'PRO'
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                }`}
-              >
-                {key === 'FREE' ? 'Get started free' : 'Start Pro'}
-              </Link>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+      </section>
 
-        <div className="mt-16 text-center">
-          <p className="text-gray-500 text-sm">
-            Need a custom plan? <a href="mailto:priyacha123@gmail.com" className="text-indigo-600 hover:underline">Contact us</a>
-          </p>
+      {/* Pricing preview */}
+      <section className="py-24">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Simple pricing</h2>
+          <p className="text-gray-500 mb-10">Start free. Upgrade when you need more.</p>
+          <Link href="/pricing" className="inline-flex items-center gap-2 text-indigo-600 font-medium hover:underline">
+            See full pricing <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-      </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 py-8">
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Key className="w-4 h-4 text-indigo-600" />
+            <span className="text-sm font-medium text-gray-900">GateKey</span>
+          </div>
+          <p className="text-sm text-gray-400">Built by Priya Kumari</p>
+        </div>
+      </footer>
     </div>
   )
 }
