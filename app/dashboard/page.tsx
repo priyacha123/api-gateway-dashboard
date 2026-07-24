@@ -12,6 +12,27 @@ export default function DashboardOverview() {
   const [metrics, setMetrics] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
+  const stats = [
+  {
+    label: 'Projects',
+    value: `${billing?.usage?.projects || 0} / ${billing?.limits?.projects || 2}`,
+    icon: <FolderOpen className="w-5 h-5 text-indigo-600" />,
+            href: '/dashboard/projects'
+  },
+  {
+    label: 'Active Keys',
+    value: billing?.usage?.activeKeys || 0,
+    icon: <Key className="w-5 h-5 text-indigo-600" />,
+            href: '/dashboard/projects'
+  },
+  {
+    label: 'Requests Today',
+    value: metrics?.totalToday || 0,
+    icon: <Activity className="w-5 h-5 text-indigo-600" />,
+            href: '/dashboard/analytics'
+  }
+]
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,26 +78,7 @@ export default function DashboardOverview() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8">
-        {[
-          {
-            label: 'Projects',
-            value: `${billing?.usage?.projects || 0} / ${billing?.limits?.projects || 2}`,
-            icon: <FolderOpen className="w-5 h-5 text-indigo-600" />,
-            href: '/dashboard/projects'
-          },
-          {
-            label: 'Active Keys',
-            value: billing?.usage?.activeKeys || 0,
-            icon: <Key className="w-5 h-5 text-indigo-600" />,
-            href: '/dashboard/projects'
-          },
-          {
-            label: 'Requests Today',
-            value: metrics?.totalToday || 0,
-            icon: <Activity className="w-5 h-5 text-indigo-600" />,
-            href: '/dashboard/analytics'
-          }
-        ].map(stat => (
+        {stats.map(stat => (
           <Link key={stat.label} href={stat.href}
             className="bg-white border border-gray-100 rounded-xl p-5 hover:border-indigo-200 transition-colors"
           >

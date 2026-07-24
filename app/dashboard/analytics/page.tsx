@@ -1,13 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
+// import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function AnalyticsPage() {
   useAuth()
   const [metrics, setMetrics] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+
+  const statCard = [
+          { label: 'Requests today', value: metrics?.totalToday || 0 },
+          { label: 'Avg response time', value: `${metrics?.avgResponseTime || 0}ms` },
+          { label: '4xx errors', value: metrics?.errorRate4xx || 0 },
+          { label: '5xx errors', value: metrics?.errorRate5xx || 0 }
+        ]
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -33,12 +40,7 @@ export default function AnalyticsPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-4 gap-4 mb-8">
-        {[
-          { label: 'Requests today', value: metrics?.totalToday || 0 },
-          { label: 'Avg response time', value: `${metrics?.avgResponseTime || 0}ms` },
-          { label: '4xx errors', value: metrics?.errorRate4xx || 0 },
-          { label: '5xx errors', value: metrics?.errorRate5xx || 0 }
-        ].map(card => (
+        {statCard.map(card => (
           <div key={card.label} className="bg-white border border-gray-100 rounded-xl p-5">
             <p className="text-sm text-gray-500 mb-1">{card.label}</p>
             <p className="text-2xl font-bold text-gray-900">{card.value}</p>

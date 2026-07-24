@@ -3,6 +3,39 @@ import { Shield, Zap, BarChart3, Key, ArrowRight, Check } from 'lucide-react'
 import { PLANS } from '@/lib/constants'
 
 export default function LandingPage() {
+  const features = [
+              {
+                icon: <Key className="w-6 h-6 text-indigo-600" />,
+                title: 'API Key Management',
+                desc: 'Generate, rotate, and revoke API keys with SHA-256 hashing. Keys are shown once and never stored in plain text.'
+              },
+              {
+                icon: <Zap className="w-6 h-6 text-indigo-600" />,
+                title: 'Rate Limiting',
+                desc: 'Sliding window rate limiting via Redis. Set custom limits per key. Protect your services from abuse automatically.'
+              },
+              {
+                icon: <Shield className="w-6 h-6 text-indigo-600" />,
+                title: 'Circuit Breaker',
+                desc: 'Auto-detect failing services and stop cascading failures. CLOSED → OPEN → HALF-OPEN recovery built in.'
+              },
+              {
+                icon: <BarChart3 className="w-6 h-6 text-indigo-600" />,
+                title: 'Usage Analytics',
+                desc: 'See requests over time, error rates, and top keys by usage. All filtered by project.'
+              },
+              {
+                icon: <Shield className="w-6 h-6 text-indigo-600" />,
+                title: 'Request Logging',
+                desc: 'Every request logged with trace ID, response time, and status code. Full audit trail out of the box.'
+              },
+              {
+                icon: <Zap className="w-6 h-6 text-indigo-600" />,
+                title: 'Multi-project Support',
+                desc: 'Organize keys by project. Different apps, different limits, one dashboard.'
+              }
+            ]
+            
   return (
     <div className="min-h-screen bg-white">
 
@@ -54,38 +87,7 @@ export default function LandingPage() {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">Everything your API needs</h2>
           <p className="text-gray-500 text-center mb-16 max-w-xl mx-auto">Stop building auth and rate limiting from scratch. GateKey handles it so you can focus on your product.</p>
           <div className="grid grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Key className="w-6 h-6 text-indigo-600" />,
-                title: 'API Key Management',
-                desc: 'Generate, rotate, and revoke API keys with SHA-256 hashing. Keys are shown once and never stored in plain text.'
-              },
-              {
-                icon: <Zap className="w-6 h-6 text-indigo-600" />,
-                title: 'Rate Limiting',
-                desc: 'Sliding window rate limiting via Redis. Set custom limits per key. Protect your services from abuse automatically.'
-              },
-              {
-                icon: <Shield className="w-6 h-6 text-indigo-600" />,
-                title: 'Circuit Breaker',
-                desc: 'Auto-detect failing services and stop cascading failures. CLOSED → OPEN → HALF-OPEN recovery built in.'
-              },
-              {
-                icon: <BarChart3 className="w-6 h-6 text-indigo-600" />,
-                title: 'Usage Analytics',
-                desc: 'See requests over time, error rates, and top keys by usage. All filtered by project.'
-              },
-              {
-                icon: <Shield className="w-6 h-6 text-indigo-600" />,
-                title: 'Request Logging',
-                desc: 'Every request logged with trace ID, response time, and status code. Full audit trail out of the box.'
-              },
-              {
-                icon: <Zap className="w-6 h-6 text-indigo-600" />,
-                title: 'Multi-project Support',
-                desc: 'Organize keys by project. Different apps, different limits, one dashboard.'
-              }
-            ].map(f => (
+            {features.map(f => (
               <div key={f.title} className="bg-white p-6 rounded-xl border border-gray-100">
                 <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center mb-4">
                   {f.icon}

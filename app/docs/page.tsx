@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Key } from 'lucide-react'
+import { endpoints, header, quickLinks, quickStart, status } from '@/lib/constants'
 
 export default function DocsPage() {
   return (
@@ -20,14 +21,8 @@ export default function DocsPage() {
         {/* Sidebar nav */}
         <aside className="w-48 flex-shrink-0">
           <nav className="sticky top-8 space-y-1">
-            {[
-              { href: '#quickstart', label: 'Quick Start' },
-              { href: '#authentication', label: 'Authentication' },
-              { href: '#rate-limiting', label: 'Rate Limiting' },
-              { href: '#errors', label: 'Error Codes' },
-              { href: '#endpoints', label: 'Endpoints' }
-            ].map(link => (
-              
+            {quickLinks.map(link => (
+                <a
                 key={link.href}
                 href={link.href}
                 className="block text-sm text-gray-600 hover:text-indigo-600 py-1.5 transition-colors"
@@ -48,11 +43,7 @@ export default function DocsPage() {
           <section id="quickstart" className="mb-12">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Start</h2>
             <div className="space-y-4">
-              {[
-                { step: '1', title: 'Sign up and create a project', desc: 'Create a free account and set up your first project from the dashboard.' },
-                { step: '2', title: 'Generate an API key', desc: 'Generate a key from your project page. Copy it — it\'s shown only once.' },
-                { step: '3', title: 'Make your first request', desc: 'Pass your key via the X-API-Key header on every request.' }
-              ].map(s => (
+              {quickStart.map(s => (
                 <div key={s.step} className="flex gap-4">
                   <div className="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                     {s.step}
@@ -117,11 +108,7 @@ export default function DocsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {[
-                    { header: 'X-RateLimit-Limit', desc: 'Maximum requests allowed per minute' },
-                    { header: 'X-RateLimit-Remaining', desc: 'Requests remaining in current window' },
-                    { header: 'X-RateLimit-Reset', desc: 'Unix timestamp when the window resets' }
-                  ].map(row => (
+                  {header.map(row => (
                     <tr key={row.header}>
                       <td className="px-4 py-3 font-mono text-xs text-indigo-600">{row.header}</td>
                       <td className="px-4 py-3 text-gray-600">{row.desc}</td>
@@ -155,13 +142,7 @@ export default function DocsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {[
-                    { status: '200', meaning: 'Request successful' },
-                    { status: '401', meaning: 'Missing or invalid API key' },
-                    { status: '403', meaning: 'Plan limit exceeded — upgrade required' },
-                    { status: '429', meaning: 'Rate limit exceeded — slow down' },
-                    { status: '503', meaning: 'Downstream service unavailable — circuit open' }
-                  ].map(row => (
+                  {status.map(row => (
                     <tr key={row.status}>
                       <td className="px-4 py-3">
                         <span className={`text-xs font-mono font-bold ${
@@ -183,21 +164,9 @@ export default function DocsPage() {
           <section id="endpoints" className="mb-12">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Endpoints</h2>
             <div className="space-y-3">
-              {[
-                { method: 'POST', path: '/auth/register', desc: 'Create a new account' },
-                { method: 'POST', path: '/auth/login', desc: 'Get a JWT token' },
-                { method: 'GET', path: '/projects', desc: 'List all projects' },
-                { method: 'POST', path: '/projects', desc: 'Create a project' },
-                { method: 'GET', path: '/projects/:id', desc: 'Get project with keys' },
-                { method: 'POST', path: '/projects/:id/keys', desc: 'Generate an API key' },
-                { method: 'DELETE', path: '/projects/:id/keys/:keyId', desc: 'Revoke a key' },
-                { method: 'GET', path: '/billing/status', desc: 'Get plan and usage' },
-                { method: 'POST', path: '/billing/upgrade', desc: 'Upgrade to PRO' },
-                { method: 'GET', path: '/service-a/data', desc: 'Proxied service A (requires API key)' },
-                { method: 'GET', path: '/service-b/data', desc: 'Proxied service B (requires API key)' }
-              ].map(ep => (
+              {endpoints.map(ep => (
                 <div key={ep.path} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded font-mono w-12 text-center ${
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded font-mono w-17 text-center ${
                     ep.method === 'GET' ? 'bg-blue-50 text-blue-700' :
                     ep.method === 'POST' ? 'bg-green-50 text-green-700' :
                     'bg-red-50 text-red-700'
