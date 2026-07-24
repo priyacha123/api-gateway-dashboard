@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Key, LayoutDashboard, FolderOpen, BarChart3, CreditCard, LogOut } from 'lucide-react'
+import { Key, LayoutDashboard, FolderOpen, BarChart3, CreditCard, LogOut, BookOpen } from 'lucide-react'
 import { getUser, logout, isAuthenticated } from '@/lib/auth'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -27,12 +27,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
-  const navLinks = [
-    { href: '/dashboard', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" /> },
-    { href: '/dashboard/projects', label: 'Projects', icon: <FolderOpen className="w-4 h-4" /> },
-    { href: '/dashboard/analytics', label: 'Analytics', icon: <BarChart3 className="w-4 h-4" /> },
-    { href: '/dashboard/billing', label: 'Billing', icon: <CreditCard className="w-4 h-4" /> },
-  ]
+const navLinks = [
+  { href: '/dashboard', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" /> },
+  { href: '/dashboard/projects', label: 'Projects', icon: <FolderOpen className="w-4 h-4" /> },
+  { href: '/dashboard/analytics', label: 'Analytics', icon: <BarChart3 className="w-4 h-4" /> },
+  { href: '/dashboard/billing', label: 'Billing', icon: <CreditCard className="w-4 h-4" /> },
+  { href: '/docs', label: 'Docs', icon: <BookOpen className="w-4 h-4" /> },
+]
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
