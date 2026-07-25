@@ -19,7 +19,7 @@ export default function DocsPage() {
 
       <div className="max-w-6xl mx-auto px-6 py-12 flex gap-12">
         {/* Sidebar nav */}
-        <aside className="w-48 flex-shrink-0">
+        <aside className="w-48 shrink-0">
           <nav className="sticky top-8 space-y-1">
             {quickLinks.map(link => (
                 <a
@@ -45,7 +45,7 @@ export default function DocsPage() {
             <div className="space-y-4">
               {quickStart.map(s => (
                 <div key={s.step} className="flex gap-4">
-                  <div className="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
                     {s.step}
                   </div>
                   <div>
@@ -165,7 +165,7 @@ export default function DocsPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Endpoints</h2>
             <div className="space-y-3">
               {endpoints.map(ep => (
-                <div key={ep.path} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
+                <div key={`${ep.method}-${ep.path}`} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
                   <span className={`text-xs font-bold px-2 py-0.5 rounded font-mono w-17 text-center ${
                     ep.method === 'GET' ? 'bg-blue-50 text-blue-700' :
                     ep.method === 'POST' ? 'bg-green-50 text-green-700' :
