@@ -54,3 +54,13 @@ export const apiRequest = async (
   })
   return res
 }
+
+export const internalApiRequest = async (path: string) => {
+  const token = getToken()
+  const res = await fetch(path, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  })
+  return res
+}

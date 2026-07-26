@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 // import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
 import { useAuth } from '@/hooks/useAuth'
+import { internalApiRequest } from '@/lib/auth'
 
 export default function AnalyticsPage() {
   useAuth()
@@ -18,7 +19,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const fetchMetrics = async () => {
-      const res = await fetch('/api/metrics')
+      const res = await internalApiRequest('/api/metrics')
       const data = await res.json()
       setMetrics(data)
       setLoading(false)

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FolderOpen, Key, Activity, ArrowRight, Plus } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { apiRequest } from '@/lib/auth'
+import { apiRequest, internalApiRequest } from '@/lib/auth'
 
 export default function DashboardOverview() {
   const { user } = useAuth()
@@ -15,7 +15,7 @@ export default function DashboardOverview() {
   const stats = [
   {
     label: 'Projects',
-    value: `${billing?.usage?.projects || 0} / ${billing?.limits?.projects || 2}`,
+    value: `${billing?.usage?.projects || 0} / ${billing?.limits?.projects || 10}`,
     icon: <FolderOpen className="w-5 h-5 text-indigo-600" />,
             href: '/dashboard/projects'
   },
@@ -38,7 +38,7 @@ export default function DashboardOverview() {
       try {
         const [billingRes, metricsRes] = await Promise.all([
           apiRequest('/billing/status'),
-          fetch('/api/metrics')
+          internalApiRequest('/api/metrics')
         ])
         const [billingData, metricsData] = await Promise.all([
           billingRes.json(),

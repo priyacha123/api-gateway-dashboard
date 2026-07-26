@@ -102,7 +102,7 @@ export default function BillingPage() {
                 className="h-2 rounded-full bg-indigo-500 transition-all"
                 style={{
                   width: currentPlan === 'PRO' ? '0%' :
-                    `${Math.min((billing?.usage?.projects / 2) * 100, 100)}%`
+                    `${Math.min((billing?.usage?.projects / billing?.limits?.projects) * 100, 100)}%`
                 }}
               />
             </div>
@@ -125,7 +125,7 @@ export default function BillingPage() {
         <ul className="space-y-3">
           {plan.features.map(f => (
             <li key={f} className="flex items-center gap-3 text-sm text-gray-600">
-              <Check className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+              <Check className="w-4 h-4 text-indigo-600 shrink-0" />
               {f}
             </li>
           ))}

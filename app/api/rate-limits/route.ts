@@ -1,26 +1,47 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import redis from '@/lib/redis'
+import { getUserFromRequest } from "@/lib/getUser"
 
 const PLAN_LIMITS: Record<string, number> = {
-    FREE: 10,
-    PLAN: 100,
+    FREE: 60,
+    PRO: 1000,
 }
 
-export async function GET() {
-    const users = await prisma.user.findMany({
-        select: { id: true, email: true, plan: true}
+export async function GET(req: NextRequest) {
+    const userId = getUserFromRequest(req)
+    if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+            projects: {
+                include: {
+                    apiKeys: {
+                        where: { isActive: true },
+                        select: { id: true, keyPrefix: true, rateLimit: true }
+                    }
+                }
+            }
+        }
     })
 
+    if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const allKeys = user.projects.flatMap(p => p.apiKeys)
+
     const usageData = await Promise.all(
-        users.map(async (user) => {
-            const count = await redis.zcard(`rate:${user.id}`)
-            const limit = PLAN_LIMITS[user.plan] || 10
+        allKeys.map(async (key) => {
+            const count = await redis.zcard(`rate:${key.id}`)
+            const limit = key.rateLimit
             return {
-                email: user.email,
-                plan: user.plan,
-                usage: count,
-                limit: limit,
+                keyPrefix: key.keyPrefix,
+                used: count,
+                limit,
                 remaining: Math.max(0, limit - count),
                 percent: Math.round((count / limit) * 100)
             }
