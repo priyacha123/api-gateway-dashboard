@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { Check, Zap, AlertTriangle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { apiRequest, getToken } from '@/lib/auth'
-import { PLANS, GATEWAY_URL } from '@/lib/constants'
+import { apiRequest } from '@/lib/auth'
+import { PLANS } from '@/lib/constants'
 
 declare global {
   interface Window {
@@ -38,83 +38,84 @@ export default function BillingPage() {
     })
   }
 
-  const handleUpgrade = async () => {
-    setProcessing(true)
-    setError('')
-    try {
-      await loadRazorpay()
+const handleUpgrade = async () => {
+  setProcessing(true)
+  setError('')
+  try {
+    await loadRazorpay()
 
-      const res = await apiRequest('/billing/create-subscription', {
-        method: 'POST'
-      })
-      const data = await res.json()
+    const res = await apiRequest('/billing/create-order', {
+      method: 'POST'
+    })
+    const data = await res.json()
 
-      if (!res.ok) {
-        setError(data.error)
-        return
-      }
+    if (!res.ok) {
+      setError(data.error)
+      return
+    }
 
-      const options = {
-        key: data.keyId,
-        subscription_id: data.subscriptionId,
-        name: 'GateKey',
-        description: 'Pro Plan — ₹999/month',
-        handler: async (response: any) => {
-          const verifyRes = await apiRequest('/billing/verify-payment', {
-            method: 'POST',
-            body: JSON.stringify({
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_subscription_id: response.razorpay_subscription_id,
-              razorpay_signature: response.razorpay_signature
-            })
+    const options = {
+      key: data.keyId,
+      amount: data.amount,
+      currency: data.currency,
+      order_id: data.orderId,
+      name: 'GateKey',
+      description: 'Upgrade to PRO Plan',
+      handler: async (response: any) => {
+        const verifyRes = await apiRequest('/billing/verify-payment', {
+          method: 'POST',
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
           })
+        })
 
-          const verifyData = await verifyRes.json()
+        const verifyData = await verifyRes.json()
 
-          if (verifyRes.ok) {
-            await fetchBilling()
-            window.location.reload()
-          } else {
-            setError(verifyData.error || 'Payment verification failed')
-          }
-        },
-        prefill: {
-          email: billing?.email
-        },
-        theme: {
-          color: '#4F46E5'
-        },
-        modal: {
-          ondismiss: () => {
-            setProcessing(false)
-          }
+        if (verifyRes.ok) {
+          await fetchBilling()
+          window.location.reload()
+        } else {
+          setError(verifyData.error || 'Payment verification failed')
         }
+      },
+      prefill: {
+        email: billing?.email
+      },
+      theme: {
+        color: '#4F46E5'
+      },
+      modal: {
+        ondismiss: () => setProcessing(false)
       }
-
-      const rzp = new window.Razorpay(options)
-      rzp.open()
-    } catch (err) {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setProcessing(false)
     }
-  }
 
-  const handleCancel = async () => {
-    if (!confirm('Cancel your PRO subscription? You will be downgraded to FREE at the end of the billing cycle.')) return
-    setCancelling(true)
-    try {
-      const res = await apiRequest('/billing/cancel-subscription', { method: 'POST' })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error)
-        return
-      }
-      await fetchBilling()
-    } finally {
-      setCancelling(false)
-    }
+    const rzp = new window.Razorpay(options)
+    rzp.open()
+  } catch {
+    setError('Something went wrong. Please try again.')
+  } finally {
+    setProcessing(false)
   }
+}
+
+const handleCancel = async () => {
+  if (!confirm('Downgrade to FREE plan?')) return
+  setCancelling(true)
+  try {
+    const res = await apiRequest('/billing/downgrade', { method: 'POST' })
+    const data = await res.json()
+    if (!res.ok) {
+      setError(data.error)
+      return
+    }
+    await fetchBilling()
+    window.location.reload()
+  } finally {
+    setCancelling(false)
+  }
+}
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -131,7 +132,7 @@ export default function BillingPage() {
 
       {error && (
         <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6 flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+          <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
@@ -190,7 +191,7 @@ export default function BillingPage() {
                 className="h-2 rounded-full bg-indigo-500 transition-all"
                 style={{
                   width: currentPlan === 'PRO' ? '0%' :
-                    `${Math.min((billing?.usage?.projects / 2) * 100, 100)}%`
+                    `${Math.min((billing?.usage?.projects / 10) * 100, 100)}%`
                 }}
               />
             </div>
@@ -215,7 +216,7 @@ export default function BillingPage() {
         <ul className="space-y-3">
           {PLANS.PRO.features.map(f => (
             <li key={f} className="flex items-center gap-3 text-sm text-gray-600">
-              <Check className={`w-4 h-4 flex-shrink-0 ${
+              <Check className={`w-4 h-4 shrink-0 ${
                 currentPlan === 'PRO' ? 'text-indigo-600' : 'text-gray-300'
               }`} />
               {f}
