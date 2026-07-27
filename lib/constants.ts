@@ -80,5 +80,82 @@ export const status = [
   { status: '503', meaning: 'Downstream service unavailable — circuit open' }
 ]
 
+export const plansPricing = [
+  {
+    name: 'Free',
+    price: '₹0',
+    period: 'forever',
+    description: 'Perfect for side projects and personal APIs.',
+    cta: 'Get started free',
+    href: '/register',
+    highlighted: false,
+    features: [
+      { text: '10 projects', included: true },
+      { text: '3 API keys per project', included: true },
+      { text: '60 requests/min rate limit', included: true },
+      { text: 'Basic analytics', included: true },
+      { text: 'Request logging', included: true },
+      { text: 'Circuit breaker protection', included: true },
+      { text: 'Unlimited API keys', included: false },
+      { text: '1000 requests/min', included: false },
+      { text: 'Advanced analytics', included: false },
+      { text: 'Priority support', included: false },
+    ]
+  },
+  {
+    name: 'Pro',
+    price: '₹999',
+    period: 'per month',
+    description: 'For teams and production APIs that need more.',
+    cta: 'Start Pro',
+    href: '/register',
+    highlighted: true,
+    features: [
+      { text: 'Unlimited projects', included: true },
+      { text: 'Unlimited API keys', included: true },
+      { text: '1000 requests/min rate limit', included: true },
+      { text: 'Advanced analytics', included: true },
+      { text: 'Request logging', included: true },
+      { text: 'Circuit breaker protection', included: true },
+      { text: 'Custom rate limits per key', included: true },
+      { text: 'Priority support', included: true },
+      { text: 'Usage alerts', included: true },
+      { text: 'Billing portal', included: true },
+    ]
+  }
+]
 
+export const faqsPricing = [
+  {
+    q: 'Can I upgrade or downgrade anytime?',
+    a: 'Yes. Upgrade to Pro instantly and your limits increase immediately. Downgrade anytime — no lock-in.'
+  },
+  {
+    q: 'What happens when I hit the rate limit?',
+    a: 'Requests over the limit receive a 429 response with a Retry-After header. Your service is never blocked — just throttled.'
+  },
+  {
+    q: 'Is my API key stored securely?',
+    a: 'We store only a SHA-256 hash of your key — never the raw value. Your key is shown once at generation and never again.'
+  },
+  {
+    q: 'What is the circuit breaker?',
+    a: 'If a downstream service returns 5+ consecutive errors, the circuit opens and requests are rejected immediately with 503. After a cooldown, one probe request is allowed through to check recovery.'
+  },
+  {
+    q: 'Do I need a credit card to start?',
+    a: 'No. The Free plan requires no payment details. Add a card only when you upgrade to Pro.'
+  }
+]
 
+export const featuresPricing = [
+  { feature: 'Projects', free: '10', pro: 'Unlimited' },
+  { feature: 'API keys per project', free: '3', pro: 'Unlimited' },
+  { feature: 'Rate limit', free: '60 req/min', pro: '1000 req/min' },
+  { feature: 'Request logging', free: '✓', pro: '✓' },
+  { feature: 'Circuit breaker', free: '✓', pro: '✓' },
+  { feature: 'Analytics', free: 'Basic', pro: 'Advanced' },
+  { feature: 'Custom rate limits', free: '—', pro: '✓' },
+  { feature: 'Priority support', free: '—', pro: '✓' },
+  { feature: 'Price', free: '₹0/mo', pro: '₹999/mo' },
+]

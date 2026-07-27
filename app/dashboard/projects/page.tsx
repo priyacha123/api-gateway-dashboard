@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, FolderOpen, Key, Trash2, ArrowRight } from 'lucide-react'
+import { Plus, FolderOpen, Key, ArrowRight, X } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { apiRequest } from '@/lib/auth'
@@ -19,7 +19,7 @@ export default function ProjectsPage() {
   const fetchProjects = async () => {
     const res = await apiRequest('/projects')
     const data = await res.json()
-    setProjects(data)
+    setProjects(Array.isArray(data) ? data : [])
     setLoading(false)
   }
 
@@ -35,10 +35,7 @@ export default function ProjectsPage() {
         body: JSON.stringify({ name, description })
       })
       const data = await res.json()
-      if (!res.ok) {
-        setError(data.error)
-        return
-      }
+      if (!res.ok) { setError(data.error); return }
       setShowModal(false)
       setName('')
       setDescription('')
@@ -50,35 +47,37 @@ export default function ProjectsPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
     </div>
   )
 
   return (
-    <div>
+    <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your API projects and keys</p>
+          <h1 className="text-xl font-semibold text-gray-900 tracking-tight">Projects</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{projects.length} project{projects.length !== 1 ? 's' : ''}</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+          className="flex items-center gap-2 bg-gray-900 text-white px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
         >
-          <Plus className="w-4 h-4" /> New Project
+          <Plus className="w-3.5 h-3.5" /> New Project
         </button>
       </div>
 
       {projects.length === 0 ? (
         <div className="bg-white border border-gray-100 rounded-xl p-16 text-center">
-          <FolderOpen className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-          <h3 className="font-medium text-gray-900 mb-2">No projects yet</h3>
+          <div className="w-12 h-12 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <FolderOpen className="w-6 h-6 text-gray-400" />
+          </div>
+          <h3 className="font-medium text-gray-900 mb-1">No projects yet</h3>
           <p className="text-gray-500 text-sm mb-6">Create your first project to start generating API keys.</p>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700"
+            className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
           >
-            Create your first project
+            Create project
           </button>
         </div>
       ) : (
@@ -87,57 +86,64 @@ export default function ProjectsPage() {
             <Link
               key={project.id}
               href={`/dashboard/projects/${project.id}`}
-              className="bg-white border border-gray-100 rounded-xl p-5 hover:border-indigo-200 transition-colors group"
+              className="bg-white border border-gray-100 rounded-xl p-5 hover:border-gray-200 hover:shadow-sm transition-all group"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center">
-                  <FolderOpen className="w-5 h-5 text-indigo-600" />
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-9 h-9 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center">
+                  <FolderOpen className="w-4 h-4 text-gray-600" />
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-indigo-500 transition-colors" />
+                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-600 transition-colors" />
               </div>
-              <h3 className="font-medium text-gray-900 mb-1">{project.name}</h3>
+              <h3 className="font-medium text-gray-900 text-sm mb-1">{project.name}</h3>
               {project.description && (
-                <p className="text-sm text-gray-500 mb-3 truncate">{project.description}</p>
+                <p className="text-xs text-gray-500 mb-3 truncate">{project.description}</p>
               )}
-              <div className="flex items-center gap-1 text-xs text-gray-400">
+              <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-3">
                 <Key className="w-3 h-3" />
-                <span>{project._count?.apiKeys || 0} keys</span>
+                <span>{project._count?.apiKeys ?? 0} keys</span>
               </div>
             </Link>
           ))}
         </div>
       )}
 
-      {/* Create project modal */}
+      {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Create project</h2>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-semibold text-gray-900">New project</h2>
+              <button onClick={() => { setShowModal(false); setError('') }} className="text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
             {error && (
-              <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">
+              <div className="bg-red-50 border border-red-100 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">
                 {error}
               </div>
             )}
 
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Project name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Project name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+                  onKeyDown={e => e.key === 'Enter' && createProject()}
+                  autoFocus
+                  className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-black"
                   placeholder="My App"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Description <span className="text-gray-400 font-normal">(optional)</span></label>
                 <input
                   type="text"
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+                  className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-black"
                   placeholder="What is this project for?"
                 />
               </div>
@@ -146,14 +152,14 @@ export default function ProjectsPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => { setShowModal(false); setError('') }}
-                className="flex-1 border border-gray-200 text-gray-700 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50"
+                className="flex-1 border border-gray-200 text-gray-700 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={createProject}
                 disabled={creating || !name.trim()}
-                className="flex-1 bg-indigo-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+                className="flex-1 bg-gray-900 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 disabled:opacity-50 transition-colors"
               >
                 {creating ? 'Creating...' : 'Create project'}
               </button>
