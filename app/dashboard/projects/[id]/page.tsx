@@ -103,7 +103,7 @@ export default function ProjectDetailPage() {
 
       {/* Code snippet */}
       <div className="bg-gray-950 rounded-xl p-5 mb-6">
-        <p className="text-gray-500 text-xs font-medium uppercase tracking-wide mb-3">Quick start</p>
+        <p className="text-gray-500 text-xs font-medium tracking-wide mb-3">bash</p>
         <code className="text-green-400 text-sm font-mono">
           curl -H &quot;X-API-Key: gk_live_••••••••&quot; {GATEWAY_URL}/service-a/data
         </code>

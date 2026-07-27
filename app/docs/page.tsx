@@ -68,6 +68,7 @@ export default function DocsPage() {
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-2">X-API-Key header (recommended)</p>
                 <div className="bg-gray-900 rounded-lg p-4">
+                  <p className="text-gray-500 text-xs font-medium tracking-wide mb-3">bash</p>
                   <code className="text-green-400 text-sm">
                     {`curl -H "X-API-Key: gk_live_xxx" https://your-gateway/service-a/data`}
                   </code>
@@ -77,6 +78,7 @@ export default function DocsPage() {
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-2">Authorization header</p>
                 <div className="bg-gray-900 rounded-lg p-4">
+                  <p className="text-gray-500 text-xs font-medium tracking-wide mb-3">bash</p>
                   <code className="text-green-400 text-sm">
                     {`curl -H "Authorization: Bearer gk_live_xxx" https://your-gateway/service-a/data`}
                   </code>
