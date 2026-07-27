@@ -64,7 +64,8 @@ export default function DashboardOverview() {
     },
     {
       label: 'Error Rate',
-      value: `${metrics?.errorRate4xx + metrics?.errorRate5xx ?? 0}`,
+      // value: `${metrics?.errorRate4xx + metrics?.errorRate5xx ?? 0}`,
+      value: `${(metrics?.errorRate4xx ?? 0) + (metrics?.errorRate5xx ?? 0)}`,
       sub: '4xx + 5xx today',
       icon: <TrendingUp className="w-4 h-4 text-gray-600" />,
       href: '/dashboard/analytics'
