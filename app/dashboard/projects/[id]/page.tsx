@@ -18,6 +18,7 @@ export default function ProjectDetailPage() {
   const [newKey, setNewKey] = useState('')
   const [keyName, setKeyName] = useState('')
   const [rateLimit, setRateLimit] = useState(60)
+  const [targetUrl, setTargetUrl] = useState('')
   const [creating, setCreating] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copiedSnippet, setCopiedSnippet] = useState('')
@@ -27,6 +28,7 @@ export default function ProjectDetailPage() {
     const res = await apiRequest(`/projects/${id}`)
     const data = await res.json()
     setProject(data)
+    setTargetUrl(data?.targetUrl || '')
     setLoading(false)
   }
 
@@ -56,6 +58,14 @@ export default function ProjectDetailPage() {
   const revokeKey = async (keyId: string) => {
     if (!confirm('Revoke this key? All requests using it will return 401 immediately.')) return
     await apiRequest(`/projects/${id}/keys/${keyId}`, { method: 'DELETE' })
+    fetchProject()
+  }
+
+  const saveTargetUrl = async () => {
+    await apiRequest(`/projects/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ targetUrl })
+    })
     fetchProject()
   }
 
@@ -101,11 +111,13 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
+      
+
       {/* Code snippet */}
       <div className="bg-gray-950 rounded-xl p-5 mb-6">
         <p className="text-gray-500 text-xs font-medium tracking-wide mb-3">bash</p>
         <code className="text-green-400 text-sm font-mono">
-          curl -H &quot;X-API-Key: gk_live_••••••••&quot; {GATEWAY_URL}/service-a/data
+          curl -H &quot;X-API-Key: gk_live_••••••••&quot; {GATEWAY_URL}/proxy/your-endpoint
         </code>
       </div>
 
@@ -178,6 +190,32 @@ export default function ProjectDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Target URL section */}
+<div className="bg-white border border-gray-100 rounded-xl p-5 mb-6">
+  <h2 className="text-sm font-medium text-gray-900 mb-4">Target URL</h2>
+  <p className="text-xs text-gray-500 mb-3">
+    GateKey will forward all authenticated requests to this URL.
+  </p>
+  <div className="flex gap-3">
+    <input
+      type="url"
+      value={targetUrl}
+      onChange={e => setTargetUrl(e.target.value)}
+      className="flex-1 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-black"
+      placeholder="https://api.yourapp.com"
+    />
+    <button
+      onClick={saveTargetUrl}
+      className="bg-gray-900 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700"
+    >
+      Save
+    </button>
+  </div>
+  {project?.targetUrl && (
+    <p className="text-xs text-gray-400 mt-2 font-mono">→ {project.targetUrl}</p>
+  )}
+</div>
 
       {/* Create key modal */}
       {showCreateModal && (
